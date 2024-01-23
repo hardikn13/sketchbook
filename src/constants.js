@@ -15,4 +15,13 @@ const COLORS = {
   LIME: "#b2f2bb",
 };
 
+const MENU_ITEMS = {
+  PENCIL: "Pencil",
+  ERASER: "Eraser",
+  UNDO: "Undo",
+  REDO: "Redo",
+  DOWNLOAD: "Download",
+};
+
 export default COLORS;
+export { MENU_ITEMS };
