@@ -1,0 +1,30 @@
+.toolboxContainer {
+  @apply p-5 absolute top-1/4 left-5 w-64 rounded-md;
+  box-shadow: 0px 7px 14px rgba(0, 0, 0, 0.05),
+    0px 0px 3.12708px rgba(0, 0, 0, 0.0798),
+    0px 0px 0.931014px rgba(0, 0, 0, 0.1702);
+  background-color: #fff;
+
+  .toolItem {
+    @apply mb-5;
+
+    .toolText {
+      font-size: 11px;
+      color: #3d3d3d;
+    }
+
+    .itemContainer {
+      @apply flex justify-between mt-2;
+
+      .colorBox {
+        @apply w-5 h-5 rounded-sm cursor-pointer mr-1;
+
+        &:hover,
+        &.active {
+          border: 1.5px solid #d6d6d6;
+          box-shadow: 0 0 0 1px #4a47b1;
+        }
+      }
+    }
+  }
+}
