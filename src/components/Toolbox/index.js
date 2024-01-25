@@ -8,7 +8,7 @@ import { changeColor, changeBrushSize } from "@/slice/toolboxSlice";
 const Toolbox = () => {
   const dispatch = useDispatch();
   const activeMenuItem = useSelector((state) => state.menu.activeMenuItem);
-  const { color } = useSelector((state) => state.toolbox[activeMenuItem]);
+  const { color, size } = useSelector((state) => state.toolbox[activeMenuItem]);
   const showStrokeToolOptions = activeMenuItem === MENU_ITEMS.PENCIL;
   const showEraserToolOptions =
     activeMenuItem === MENU_ITEMS.ERASER ||
@@ -147,6 +147,7 @@ const Toolbox = () => {
               max={10}
               step={1}
               onChange={updateEraserSize}
+              value={size}
             />
           </div>
         </div>
