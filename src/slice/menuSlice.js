@@ -8,7 +8,7 @@ const initialState = {
 
 export const menuSlice = createSlice({
   name: "menu",
-  initialState: {},
+  initialState,
   reducers: {
     setActiveMenuItem: (state, action) => {
       state.activeMenuItem = action.payload;
