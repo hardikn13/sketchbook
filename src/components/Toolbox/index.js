@@ -132,6 +132,7 @@ const Toolbox = () => {
                 border: "1px solid black",
                 backgroundColor: COLORS.WHITE,
               }}
+              onClick={() => updateColor(COLORS.WHITE)}
             />
           </div>
         </div>
