@@ -7,13 +7,14 @@ import {
   faCircleDown,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./index.module.css";
+import cx from "classnames";
 import { useSelector, useDispatch } from "react-redux";
 import { MENU_ITEMS } from "@/constants";
 import { setActiveMenuItem, setActionMenuItem } from "@/slice/menuSlice";
 
 const Menu = () => {
   const dispatch = useDispatch();
-
+  const activeMenuItem = useSelector((state) => state.menu.activeMenuItem);
   const handleMenuClick = (menuItem) => {
     dispatch(setActiveMenuItem(menuItem));
   };
@@ -25,13 +26,17 @@ const Menu = () => {
   return (
     <div className={styles.menuContainer}>
       <div
-        className={styles.iconWrapper}
+        className={cx(styles.iconWrapper, {
+          [styles.active]: activeMenuItem === MENU_ITEMS.PENCIL,
+        })}
         onClick={() => handleMenuClick(MENU_ITEMS.PENCIL)}
       >
         <FontAwesomeIcon icon={faPencil} className={styles.icon} />
       </div>
       <div
-        className={styles.iconWrapper}
+        className={cx(styles.iconWrapper, {
+          [styles.active]: activeMenuItem === MENU_ITEMS.ERASER,
+        })}
         onClick={() => handleMenuClick(MENU_ITEMS.ERASER)}
       >
         <FontAwesomeIcon icon={faEraser} className={styles.icon} />
