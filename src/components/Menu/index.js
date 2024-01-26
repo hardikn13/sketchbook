@@ -4,13 +4,15 @@ import {
   faEraser,
   faRotateLeft,
   faRotateRight,
-  faCircleDown,
+  faDownload,
+  faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./index.module.css";
 import cx from "classnames";
 import { useSelector, useDispatch } from "react-redux";
 import { MENU_ITEMS } from "@/constants";
 import { setActiveMenuItem, setActionMenuItem } from "@/slice/menuSlice";
+import { useEffect } from "react";
 
 const Menu = () => {
   const dispatch = useDispatch();
@@ -22,6 +24,10 @@ const Menu = () => {
   const handleActionItemClick = (menuItem) => {
     dispatch(setActionMenuItem(menuItem));
   };
+
+  useEffect(() => {
+    document.title = "Sketchbook";
+  }, []);
 
   return (
     <div className={styles.menuContainer}>
@@ -55,9 +61,15 @@ const Menu = () => {
       </div>
       <div
         className={styles.iconWrapper}
+        onClick={() => handleActionItemClick(MENU_ITEMS.CLEAR)}
+      >
+        <FontAwesomeIcon icon={faTrashCan} className={styles.icon} />
+      </div>
+      <div
+        className={styles.iconWrapper}
         onClick={() => handleActionItemClick(MENU_ITEMS.DOWNLOAD)}
       >
-        <FontAwesomeIcon icon={faCircleDown} className={styles.icon} />
+        <FontAwesomeIcon icon={faDownload} className={styles.icon} />
       </div>
     </div>
   );

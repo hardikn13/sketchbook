@@ -20,6 +20,7 @@ const MENU_ITEMS = {
   ERASER: "Eraser",
   UNDO: "Undo",
   REDO: "Redo",
+  CLEAR: "Clear",
   DOWNLOAD: "Download",
 };
 

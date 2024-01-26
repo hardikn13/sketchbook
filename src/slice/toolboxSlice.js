@@ -13,6 +13,7 @@ const initialState = {
   },
   [MENU_ITEMS.UNDO]: null,
   [MENU_ITEMS.REDO]: null,
+  [MENU_ITEMS.CLEAR]: null,
   [MENU_ITEMS.DOWNLOAD]: null,
 };
 
