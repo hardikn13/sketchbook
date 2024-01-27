@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { MENU_ITEMS } from "@/constants";
 import { setActionMenuItem } from "@/slice/menuSlice";
@@ -10,10 +10,6 @@ const Board = () => {
   const drawHistory = useRef([]);
   const historyPointer = useRef(0);
   const shouldDraw = useRef(false);
-  const pinchDistance = useRef(0);
-  const offsetX = useRef(0);
-  const offsetY = useRef(0);
-
   const { activeMenuItem, actionMenuItem } = useSelector((state) => state.menu);
   const { color, size } = useSelector((state) => state.toolbox[activeMenuItem]);
 
@@ -22,8 +18,36 @@ const Board = () => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
 
-    // ... (unchanged code for handling other menu actions)
-
+    if (actionMenuItem === MENU_ITEMS.DOWNLOAD) {
+      const URL = canvas.toDataURL();
+      const anchor = document.createElement("a");
+      anchor.href = URL;
+      anchor.download = "sketch.jpg";
+      anchor.click();
+    } else if (
+      actionMenuItem === MENU_ITEMS.UNDO ||
+      actionMenuItem === MENU_ITEMS.REDO
+    ) {
+      if (historyPointer.current > 0 && actionMenuItem === MENU_ITEMS.UNDO) {
+        historyPointer.current -= 1;
+      } else if (
+        historyPointer.current === 0 &&
+        actionMenuItem === MENU_ITEMS.UNDO
+      ) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        dispatch(setActionMenuItem(null));
+        return;
+      }
+      if (
+        historyPointer.current < drawHistory.current.length - 1 &&
+        actionMenuItem === MENU_ITEMS.REDO
+      )
+        historyPointer.current += 1;
+      const imageData = drawHistory.current[historyPointer.current];
+      context.putImageData(imageData, 0, 0);
+    } else if (actionMenuItem === MENU_ITEMS.CLEAR) {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+    }
     dispatch(setActionMenuItem(null));
   }, [actionMenuItem, dispatch]);
 
@@ -69,84 +93,41 @@ const Board = () => {
 
     const handleMouseDown = (e) => {
       shouldDraw.current = true;
-      beginPath(e.clientX - offsetX.current, e.clientY - offsetY.current);
-      socket.emit("beginPath", {
-        x: e.clientX - offsetX.current,
-        y: e.clientY - offsetY.current,
-      });
+      beginPath(e.clientX, e.clientY);
+      socket.emit("beginPath", { x: e.clientX, y: e.clientY });
     };
 
     const handleTouchStart = (e) => {
       e.preventDefault();
 
-      if (e.touches.length === 1) {
-        // Single touch - treat it as a normal drawing
-        const touch = e.touches[0];
+      const touch = e.touches[0];
 
-        handleMouseDown({
-          clientX: touch.clientX,
-          clientY: touch.clientY,
-        });
-      } else if (e.touches.length === 2) {
-        // Two touches - initiate pinch gesture for zooming
-        const touch1 = e.touches[0];
-        const touch2 = e.touches[1];
-
-        pinchDistance.current = Math.hypot(
-          touch2.clientX - touch1.clientX,
-          touch2.clientY - touch1.clientY
-        );
-      }
+      handleMouseDown({
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
     };
 
     const handleTouchMove = (e) => {
       e.preventDefault();
 
-      if (e.touches.length === 1) {
-        const touch = e.touches[0];
+      const touch = e.touches[0];
 
-        if (shouldDraw.current) {
-          handleMouseMove({
-            clientX: touch.clientX,
-            clientY: touch.clientY,
-          });
-        }
-      } else if (e.touches.length === 2) {
-        // Two touches - handle pinch gesture for zooming
-        const touch1 = e.touches[0];
-        const touch2 = e.touches[1];
-
-        const newPinchDistance = Math.hypot(
-          touch2.clientX - touch1.clientX,
-          touch2.clientY - touch1.clientY
-        );
-
-        // Calculate the pinch scale factor
-        const scale = newPinchDistance / pinchDistance.current;
-
-        // Update the offset to maintain the current drawing position
-        offsetX.current *= scale;
-        offsetY.current *= scale;
-
-        pinchDistance.current = newPinchDistance;
-      }
+      handleMouseMove({
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
     };
 
     const handleTouchEnd = (e) => {
-      if (e.touches.length === 0) {
-        // No touches - end drawing
-        handleMouseUp(e);
-      }
+      handleMouseUp(e);
     };
 
     const handleMouseMove = (e) => {
       if (!shouldDraw.current) return;
-      drawLine(e.clientX - offsetX.current, e.clientY - offsetY.current);
-      beginPath(e.clientX - offsetX.current, e.clientY - offsetY.current);
-      socket.emit("drawLine", {
-        x: e.clientX - offsetX.current,
-        y: e.clientY - offsetY.current,
-      });
+      drawLine(e.clientX, e.clientY);
+      beginPath(e.clientX, e.clientY);
+      socket.emit("drawLine", { x: e.clientX, y: e.clientY });
     };
 
     const handleMouseUp = (e) => {
@@ -157,11 +138,11 @@ const Board = () => {
     };
 
     const handleBeginPath = (path) => {
-      beginPath(path.x + offsetX.current, path.y + offsetY.current);
+      beginPath(path.x, path.y);
     };
 
     const handleDrawLine = (path) => {
-      drawLine(path.x + offsetX.current, path.y + offsetY.current);
+      drawLine(path.x, path.y);
     };
 
     canvas.addEventListener("mousedown", handleMouseDown);
