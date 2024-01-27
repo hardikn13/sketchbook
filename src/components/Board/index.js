@@ -11,6 +11,8 @@ const Board = () => {
   const historyPointer = useRef(0);
   const shouldDraw = useRef(false);
   const pinchDistance = useRef(0);
+  const offsetX = useRef(0);
+  const offsetY = useRef(0);
 
   const { activeMenuItem, actionMenuItem } = useSelector((state) => state.menu);
   const { color, size } = useSelector((state) => state.toolbox[activeMenuItem]);
@@ -67,8 +69,11 @@ const Board = () => {
 
     const handleMouseDown = (e) => {
       shouldDraw.current = true;
-      beginPath(e.clientX, e.clientY);
-      socket.emit("beginPath", { x: e.clientX, y: e.clientY });
+      beginPath(e.clientX - offsetX.current, e.clientY - offsetY.current);
+      socket.emit("beginPath", {
+        x: e.clientX - offsetX.current,
+        y: e.clientY - offsetY.current,
+      });
     };
 
     const handleTouchStart = (e) => {
@@ -119,9 +124,9 @@ const Board = () => {
         // Calculate the pinch scale factor
         const scale = newPinchDistance / pinchDistance.current;
 
-        // Adjust canvas size based on the pinch scale factor
-        canvas.width *= scale;
-        canvas.height *= scale;
+        // Update the offset to maintain the current drawing position
+        offsetX.current *= scale;
+        offsetY.current *= scale;
 
         pinchDistance.current = newPinchDistance;
       }
@@ -136,9 +141,12 @@ const Board = () => {
 
     const handleMouseMove = (e) => {
       if (!shouldDraw.current) return;
-      drawLine(e.clientX, e.clientY);
-      beginPath(e.clientX, e.clientY);
-      socket.emit("drawLine", { x: e.clientX, y: e.clientY });
+      drawLine(e.clientX - offsetX.current, e.clientY - offsetY.current);
+      beginPath(e.clientX - offsetX.current, e.clientY - offsetY.current);
+      socket.emit("drawLine", {
+        x: e.clientX - offsetX.current,
+        y: e.clientY - offsetY.current,
+      });
     };
 
     const handleMouseUp = (e) => {
@@ -149,11 +157,11 @@ const Board = () => {
     };
 
     const handleBeginPath = (path) => {
-      beginPath(path.x, path.y);
+      beginPath(path.x + offsetX.current, path.y + offsetY.current);
     };
 
     const handleDrawLine = (path) => {
-      drawLine(path.x, path.y);
+      drawLine(path.x + offsetX.current, path.y + offsetY.current);
     };
 
     canvas.addEventListener("mousedown", handleMouseDown);
