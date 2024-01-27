@@ -91,10 +91,7 @@ const Board = () => {
       context.stroke();
     };
 
-    let isDrawing = false;
-
     const handleMouseDown = (e) => {
-      isDrawing = true;
       shouldDraw.current = true;
       beginPath(e.clientX, e.clientY);
       socket.emit("beginPath", { x: e.clientX, y: e.clientY });
@@ -103,72 +100,37 @@ const Board = () => {
     const handleTouchStart = (e) => {
       e.preventDefault();
 
-      if (e.touches.length === 1) {
-        isDrawing = true;
-        const touch = e.touches[0];
+      const touch = e.touches[0];
 
-        handleMouseDown({
-          clientX: touch.clientX,
-          clientY: touch.clientY,
-        });
-      }
+      handleMouseDown({
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
     };
 
     const handleTouchMove = (e) => {
-      if (isDrawing && e.touches.length === 1) {
-        const touch = e.touches[0];
-        // Replace e.clientX and e.clientY with touch.clientX and touch.clientY
-        drawLine(touch.clientX, touch.clientY);
-        socket.emit("drawLine", { x: touch.clientX, y: touch.clientY });
-      } else if (e.touches.length === 2) {
-        isDrawing = false;
-        // Calculate the center point of the two fingers
-        let centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-        let centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      e.preventDefault();
 
-        if (initialCenter) {
-          // Calculate the distance moved
-          let dx = centerX - initialCenter.x;
-          let dy = centerY - initialCenter.y;
+      const touch = e.touches[0];
 
-          // Update the canvas position
-          let transform = canvas.style.transform;
-          transform += " translate(" + dx + "px, " + dy + "px)";
-          canvas.style.transform = transform;
-        }
-
-        // Set the initial center for the next move event
-        initialCenter = { x: centerX, y: centerY };
-      }
+      handleMouseMove({
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
     };
 
     const handleTouchEnd = (e) => {
-      if (isDrawing && e.touches.length === 0) {
-        isDrawing = false;
-        shouldDraw.current = false;
-        const imageData = context.getImageData(
-          0,
-          0,
-          canvas.width,
-          canvas.height
-        );
-        drawHistory.current.push(imageData);
-      } else if (e.touches.length < 2) {
-        initialCenter = null; // Reset the initial center when a finger is lifted
-      }
+      handleMouseUp(e);
     };
 
     const handleMouseMove = (e) => {
       if (!shouldDraw.current) return;
-      if (isDrawing) {
-        drawLine(e.clientX, e.clientY);
-        beginPath(e.clientX, e.clientY);
-        socket.emit("drawLine", { x: e.clientX, y: e.clientY });
-      }
+      drawLine(e.clientX, e.clientY);
+      beginPath(e.clientX, e.clientY);
+      socket.emit("drawLine", { x: e.clientX, y: e.clientY });
     };
 
     const handleMouseUp = (e) => {
-      isDrawing = false;
       shouldDraw.current = false;
       const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
       drawHistory.current.push(imageData);
@@ -182,46 +144,6 @@ const Board = () => {
     const handleDrawLine = (path) => {
       drawLine(path.x, path.y);
     };
-
-    let initialCenter = null;
-
-    canvas.addEventListener(
-      "touchmove",
-      function (event) {
-        if (event.touches.length === 2) {
-          // Calculate the center point of the two fingers
-          let centerX =
-            (event.touches[0].clientX + event.touches[1].clientX) / 2;
-          let centerY =
-            (event.touches[0].clientY + event.touches[1].clientY) / 2;
-
-          if (initialCenter) {
-            // Calculate the distance moved
-            let dx = centerX - initialCenter.x;
-            let dy = centerY - initialCenter.y;
-
-            // Update the canvas position
-            let transform = canvas.style.transform;
-            transform += " translate(" + dx + "px, " + dy + "px)";
-            canvas.style.transform = transform;
-          }
-
-          // Set the initial center for the next move event
-          initialCenter = { x: centerX, y: centerY };
-        }
-      },
-      false
-    );
-
-    canvas.addEventListener(
-      "touchend",
-      function (event) {
-        if (event.touches.length < 2) {
-          initialCenter = null; // Reset the initial center when a finger is lifted
-        }
-      },
-      false
-    );
 
     canvas.addEventListener("mousedown", handleMouseDown);
     canvas.addEventListener("mousemove", handleMouseMove);
