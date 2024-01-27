@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { MENU_ITEMS } from "@/constants";
 import { setActionMenuItem } from "@/slice/menuSlice";
@@ -100,12 +100,54 @@ const Board = () => {
     const handleTouchStart = (e) => {
       e.preventDefault();
 
-      const touch = e.touches[0];
+      if (e.touches.length === 1) {
+        // Single touch - treat it as a normal drawing
+        const touch = e.touches[0];
 
-      handleMouseDown({
-        clientX: touch.clientX,
-        clientY: touch.clientY,
-      });
+        handleMouseDown({
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+        });
+      } else if (e.touches.length === 2) {
+        // Two touches - initiate infinite scroll
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+
+        const initialDistance = Math.hypot(
+          touch2.clientX - touch1.clientX,
+          touch2.clientY - touch1.clientY
+        );
+
+        const handleTouchMoveScroll = (e) => {
+          e.preventDefault();
+
+          if (e.touches.length === 2) {
+            const touch1 = e.touches[0];
+            const touch2 = e.touches[1];
+
+            const currentDistance = Math.hypot(
+              touch2.clientX - touch1.clientX,
+              touch2.clientY - touch1.clientY
+            );
+
+            const distanceDelta = currentDistance - initialDistance;
+
+            // Adjust canvas size based on the distance change
+            canvas.width += distanceDelta * 2;
+            canvas.height += distanceDelta * 2;
+          }
+        };
+
+        const handleTouchEndScroll = (e) => {
+          // Remove the scroll event listeners when the touches end
+          document.removeEventListener("touchmove", handleTouchMoveScroll);
+          document.removeEventListener("touchend", handleTouchEndScroll);
+        };
+
+        // Attach the scroll event listeners
+        document.addEventListener("touchmove", handleTouchMoveScroll);
+        document.addEventListener("touchend", handleTouchEndScroll);
+      }
     };
 
     const handleTouchMove = (e) => {

@@ -28,7 +28,7 @@ const Toolbox = () => {
   return (
     <div className={styles.toolboxContainer}>
       {showStrokeToolOptions && (
-        <div className={styles.toolItem}>
+        <div className={`${styles.toolItem} mr-5 w-90`}>
           <h4 className={styles.toolText}>Stroke Color</h4>
           <div className={styles.itemContainer}>
             <div

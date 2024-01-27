@@ -5,8 +5,14 @@
     0px 0px 0.931014px rgba(0, 0, 0, 0.1702);
   background-color: #fff;
 
+  @media (max-width: 768px) {
+    @apply w-full flex bottom-0 top-auto left-0;
+  }
+
   .toolItem {
-    @apply mb-5;
+    @media (min-width: 1024px) {
+      @apply mb-5;
+    }
 
     .toolText {
       font-size: 11px;

@@ -5,6 +5,10 @@
     0px 0px 0.931014px rgba(0, 0, 0, 0.1702);
   transform: translateX(-50%);
 
+  @media (max-width: 768px) {
+    @apply w-90;
+  }
+
   .iconWrapper {
     @apply flex items-center justify-center w-10 h-10 rounded-md cursor-pointer;
     background-color: #fff;
