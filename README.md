@@ -4,15 +4,14 @@
 
 ![image](https://github.com/hardikn13/sketchbook/assets/106538864/e4ed0961-1960-4df9-af83-29ea3dfaf863)
 
-```markdown
+
 Sketchbook is a web application that allows you to collaborate with others in real-time and create digital artwork using Next.js, Socket.IO, and the Canvas API.
-```
 
 ## Features
 
 ```markdown
 - Real-time Collaboration: Draw and interact with others on the same canvas simultaneously.
-- Versatile Drawing Tools: Use a variety of tools like brushes, pens, and erasers to express your creativity.
+- Versatile Drawing Tools: Use a variety of tools like pens and erasers to express your creativity.
 - Undo and Redo: Easily correct mistakes and experiment with your art.
 - Download: Save your masterpieces by downloading them as image files.
 ```
