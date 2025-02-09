@@ -43,7 +43,7 @@ npm install
 ```bash
 npm start
 ```
-5. Visit http://localhost:3000 in your web browser to use the meme generator.
+5. Visit http://localhost:3000 in your web browser to use sketchbook.
 
 ## Fork the repository.
 
